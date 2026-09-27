@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SignalFlow — Interactive Traffic Signal Control Simulator built with HTML5, CSS3, and vanilla JavaScript.">
+  <title>SignalFlow | Traffic Signal Control Simulator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient Scene Background -->
+  <div class="scene-bg" aria-hidden="true">
+    <div class="scene-layer scene-a"></div>
+    <div class="scene-layer scene-b"></div>
+    <div class="scene-vignette"></div>
+    <div class="scene-shade"></div>
+  </div>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <button class="brand" id="brandHome" type="button" aria-label="SignalFlow home">
+      <span class="brand-signal" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-copy">
+        <strong>Signal<span>Flow</span></strong>
+        <small>Traffic Signal Control Simulator</small>
+      </span>
+    </button>
+
+    <nav class="nav-links" aria-label="Primary navigation">
+      <button class="nav-link active" data-view="simulator" type="button">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+        <span>Simulator</span>
+      </button>
+
+      <button class="nav-link" data-view="analytics" type="button">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        <span>Analytics</span>
+      </button>
+
+      <button class="nav-link" data-view="settings" type="button">
+        <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+    <div class="system-box">
+      <div class="online-pill">
+        <span class="online-dot" id="statusDot"></span>
+        <span id="systemStatus">System Online</span>
+      </div>
+      <div class="clock-box">
+        <small id="dateText">—</small>
+        <strong id="timeText">—</strong>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Application Shell -->
+  <main class="app-shell">
+    
+    <!-- VIEW 1: SIMULATOR -->
+    <section class="view active-view" id="simulatorView" data-view-panel="simulator">
+      <div class="dashboard-grid">
+        
+        <!-- LEFT COLUMN: CONTROLS -->
+        <section class="glass-card control-panel">
+          <div class="card-heading">
+            <div class="heading-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </div>
+            <div>
+              <h2>Control Panel</h2>
+              <p>Manage the traffic signal manually or run it automatically</p>
+            </div>
+          </div>
+
+          <div class="section-label">Mode Selection</div>
+          <div class="mode-grid">
+            <button class="mode-btn active" id="manualMode" type="button">
+              <svg class="btn-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v5"></path>
+                <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path>
+                <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"></path>
+                <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"></path>
+              </svg>
+              <span>Manual</span>
+            </button>
+
+            <button class="mode-btn" id="autoMode" type="button">
+              <svg class="btn-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <span>Auto</span>
+            </button>
+          </div>
+
+          <div class="section-title-row">
+            <span>Signal Controls</span>
+            <small id="signalModeHint">Manual mode</small>
+          </div>
+
+          <!-- Clean Signal Buttons without kbd tags -->
+          <div class="signal-grid">
+            <button class="signal-btn red" id="redBtn" type="button">
+              <span class="signal-orb"></span>
+              <strong>Red</strong>
+            </button>
+            <button class="signal-btn yellow" id="yellowBtn" type="button">
+              <span class="signal-orb"></span>
+              <strong>Yellow</strong>
+            </button>
+            <button class="signal-btn green" id="greenBtn" type="button">
+              <span class="signal-orb"></span>
+              <strong>Green</strong>
+            </button>
+          </div>
+
+          <div class="action-grid">
+            <button class="action-btn primary" id="autoBtn" type="button">
+              <span id="autoIcon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                  <polygon points="6 4 20 12 6 20 6 4"></polygon>
+                </svg>
+              </span>
+              <span id="autoText">Start Auto</span>
+            </button>
+
+            <button class="action-btn" id="pauseBtn" type="button" disabled>
+              <span id="pauseIcon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16"></rect>
+                  <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+              </span>
+              <span id="pauseText">Pause</span>
+            </button>
+
+            <button class="action-btn" id="resetBtn" type="button">
+              <span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                  <polyline points="3 3 3 8 8 8"></polyline>
+                </svg>
+              </span>
+              <span>Reset</span>
+            </button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="section-title-row">
+            <span>Presets</span>
+            <small>Operating Scenarios</small>
+          </div>
+          <div class="preset-grid">
+            <button class="preset-btn active" data-preset="normal" type="button">Normal</button>
+            <button class="preset-btn" data-preset="night" type="button">Night</button>
+            <button class="preset-btn" data-preset="peak" type="button">Peak Hour</button>
+            <button class="preset-btn danger" data-preset="emergency" type="button">Emergency</button>
+          </div>
+
+          <div class="section-title-row timing-title">
+            <span>Custom Timing <small>(seconds)</small></span>
+            <button class="inline-reset" id="restoreTimingBtn" type="button">↻ Defaults</button>
+          </div>
+          <div class="timing-grid">
+            <label>Red
+              <input id="redTiming" type="number" min="1" max="300" value="10">
+            </label>
+            <label>Yellow
+              <input id="yellowTiming" type="number" min="1" max="120" value="3">
+            </label>
+            <label>Green
+              <input id="greenTiming" type="number" min="1" max="300" value="8">
+            </label>
+          </div>
+          <button class="apply-btn" id="applyTimingBtn" type="button">Apply Settings</button>
+          <p class="form-message" id="timingMessage" role="status"></p>
+        </section>
+
+        <!-- CENTER COLUMN: INTERSECTION SCENE -->
+        <section class="scene-column">
+          <div class="scene-header">
+            <div>
+              <span class="mini-label">LIVE INTERSECTION</span>
+              <h2>Signal Simulation</h2>
+            </div>
+            <!-- <span class="live-pill"><i></i> LIVE</span> -->
+          </div>
+
+          <div class="scene-card" id="sceneCard">
+            <!-- Scene Layers for Synchronized Crossfading -->
+            <div class="card-scene-layer card-scene-a"></div>
+            <div class="card-scene-layer card-scene-b"></div>
+
+            <div class="scene-top-chip">
+              <span>STATE</span>
+              <strong id="sceneState">OFF</strong>
+            </div>
+
+            <!-- Bottom State Overlay (Compact Bar on Mobile) -->
+            <div class="state-overlay-card">
+              <div class="state-main">
+                <span class="state-light" id="stateLight"></span>
+                <div>
+                  <span class="mini-label">SIGNAL</span>
+                  <strong id="currentState">SYSTEM OFF</strong>
+                </div>
+              </div>
+
+              <div class="progress-track">
+                <span id="progressBar"></span>
+              </div>
+
+              <div class="next-row">
+                <span>Next:</span>
+                <strong id="nextState">—</strong>
+              </div>
+
+              <div class="countdown-area">
+                <span class="mini-label">CHANGE IN</span>
+                <strong id="countdown">—</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Emergency Banner -->
+          <div class="emergency-banner hidden" id="emergencyBanner">
+            <div>
+              <strong>Emergency Mode Active</strong>
+              <span>Signal locked on RED for intersection safety.</span>
+            </div>
+            <button id="resumeNormalBtn" type="button">Resume Normal</button>
+          </div>
+        </section>
+
+        <!-- RIGHT COLUMN: ACTIVITY & STATISTICS -->
+        <aside class="right-column">
+          <section class="glass-card activity-card">
+            <div class="card-heading compact">
+              <div class="heading-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              </div>
+              <div><h2>Activity Log</h2></div>
+              <button class="clear-btn" id="clearActivityBtn" type="button">Clear</button>
+            </div>
+            <div class="activity-list" id="activityList" aria-live="polite"></div>
+          </section>
+
+          <section class="glass-card stats-card">
+            <div class="card-heading compact">
+              <div class="heading-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                  <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                </svg>
+              </div>
+              <div><h2>Session Statistics</h2></div>
+              <button class="clear-btn" id="resetStatsBtn" type="button">Reset</button>
+            </div>
+            <div class="stats-grid">
+              <div><strong id="cycleCount">0</strong><span>Cycles</span></div>
+              <div><strong id="redCount">0</strong><span>Red</span></div>
+              <div><strong id="yellowCount">0</strong><span>Yellow</span></div>
+              <div><strong id="greenCount">0</strong><span>Green</span></div>
+              <div><strong id="runtime">00:00</strong><span>Runtime</span></div>
+              <div><strong id="modeStat">Manual</strong><span>Mode</span></div>
+              <div><strong id="emergencyCount">0</strong><span>Emergency</span></div>
+              <div><strong id="nightCount">0</strong><span>Night Cycles</span></div>
+            </div>
+          </section>
+
+          <section class="glass-card shortcuts-card">
+            <div class="card-heading compact">
+              <div class="heading-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+                  <line x1="6" y1="8" x2="6" y2="8"></line>
+                  <line x1="10" y1="8" x2="10" y2="8"></line>
+                  <line x1="14" y1="8" x2="14" y2="8"></line>
+                  <line x1="18" y1="8" x2="18" y2="8"></line>
+                  <line x1="6" y1="12" x2="6" y2="12"></line>
+                  <line x1="18" y1="12" x2="18" y2="12"></line>
+                  <line x1="7" y1="16" x2="17" y2="16"></line>
+                </svg>
+              </div>
+              <div><h2>Keyboard Shortcuts</h2></div>
+            </div>
+            <div class="shortcut-grid">
+              <div><kbd>R</kbd><span>Set Red</span></div>
+              <div><kbd>Space</kbd><span>Pause / Resume</span></div>
+              <div><kbd>Y</kbd><span>Set Yellow</span></div>
+              <div><kbd>E</kbd><span>Emergency Mode</span></div>
+              <div><kbd>G</kbd><span>Set Green</span></div>
+              <div><kbd>S</kbd><span>Stop Auto</span></div>
+              <div><kbd>A</kbd><span>Toggle Auto</span></div>
+              <div><kbd>Esc</kbd><span>Reset System</span></div>
+            </div>
+          </section>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- VIEW 2: ANALYTICS -->
+    <section class="view" id="analyticsView" data-view-panel="analytics">
+      <div class="subpage-heading">
+        <div>
+          <span class="mini-label">SESSION INSIGHTS</span>
+          <h1>Signal Analytics</h1>
+          <p>Real-time operational metrics generated during this simulator session.</p>
+        </div>
+        <button class="back-btn" id="analyticsBackBtn" type="button">← Back to Simulator</button>
+      </div>
+
+      <div class="analytics-cards">
+        <div class="glass-card metric-card">
+          <span>Total Changes</span>
+          <strong id="analyticsChanges">0</strong>
+        </div>
+        <div class="glass-card metric-card">
+          <span>Completed Cycles</span>
+          <strong id="analyticsCycles">0</strong>
+        </div>
+        <div class="glass-card metric-card">
+          <span>Total Runtime</span>
+          <strong id="analyticsRuntime">00:00</strong>
+        </div>
+        <div class="glass-card metric-card">
+          <span>Current Mode</span>
+          <strong id="analyticsMode">Manual</strong>
+        </div>
+      </div>
+
+      <div class="glass-card usage-card">
+        <div class="card-heading">
+          <div class="heading-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </div>
+          <div>
+            <h2>Signal Usage Distribution</h2>
+            <p>Proportion of activations across signal states in this session.</p>
+          </div>
+        </div>
+        <div class="usage-row">
+          <span>Red</span>
+          <div><i id="redBar"></i></div>
+          <strong id="analyticsRed">0</strong>
+        </div>
+        <div class="usage-row">
+          <span>Yellow</span>
+          <div><i id="yellowBar"></i></div>
+          <strong id="analyticsYellow">0</strong>
+        </div>
+        <div class="usage-row">
+          <span>Green</span>
+          <div><i id="greenBar"></i></div>
+          <strong id="analyticsGreen">0</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: SETTINGS -->
+    <section class="view" id="settingsView" data-view-panel="settings">
+      <div class="subpage-heading">
+        <div>
+          <span class="mini-label">CONFIGURATION</span>
+          <h1>Settings</h1>
+          <p>Customize simulator preferences and persistence behavior.</p>
+        </div>
+        <button class="back-btn" id="settingsBackBtn" type="button">← Back to Simulator</button>
+      </div>
+
+      <div class="settings-layout">
+        <div class="glass-card settings-card">
+          <div class="setting-row">
+            <div>
+              <strong>Remember Custom Timing</strong>
+              <p>Preserve configured Red, Yellow, and Green seconds across page reloads.</p>
+            </div>
+            <label class="switch">
+              <input id="rememberTiming" type="checkbox" checked>
+              <span></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <strong>Enable Keyboard Shortcuts</strong>
+              <p>Allow hotkeys (R, Y, G, A, Space, E, S, Esc) to operate the simulator.</p>
+            </div>
+            <label class="switch">
+              <input id="shortcutsEnabled" type="checkbox" checked>
+              <span></span>
+            </label>
+          </div>
+
+          <button class="apply-btn settings-save" id="saveSettingsBtn" type="button">Save Preferences</button>
+          <p class="form-message" id="settingsMessage" role="status"></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
